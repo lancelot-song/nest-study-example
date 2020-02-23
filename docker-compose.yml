@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+
+  cli:
+    image: nestjs/cli
+    volumes:
+      - $PWD/:/workspace
+    tty: true
+    
+  nest:
+    image: node:${NODE_VERSION}
+    working_dir: /home/node/app
+    command: npm run start
+    volumes:
+      - $PWD/:/home/node/app
+    ports:
+      - ${APP_PORT}:3000
+    links:
+      - postgres
+
+  postgres:
+    image: postgres
+    container_name: lszh_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - $PWD/docker/data:/var/lib/postgresql/data
+      - $PWD/docker/conf/my-progres.conf:/etc/postgresql/postgresql.conf
